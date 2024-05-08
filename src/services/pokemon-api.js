@@ -1,4 +1,4 @@
-export function fetchPokemon(name) {
+function fetchPokemon(name) {
   return (
     fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
       //* отличная проверка ошибки
@@ -10,3 +10,9 @@ export function fetchPokemon(name) {
       })
   );
 }
+
+const api = {
+  fetchPokemon,
+};
+
+export default api;

@@ -1,9 +1,58 @@
 import PokemonDataView from 'components/PokemonDataView';
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PokemonErrorView from 'components/PokemonErrorView';
 import PokemonPendingView from 'components/PokemonPendingView';
-import { fetchPokemon } from 'services/pokemon-api';
+import pokemonAPI from 'services/pokemon-api';
 
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
+
+export default function PokemonInfo({ pokemonName }) {
+  const [pokemon, setPokemon] = useState(null);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState(Status.IDLE);
+
+  useEffect(() => {
+    if (!pokemonName) {
+      //* fetch пустой строки приведет к ошибку, поэтому делаем сперва проверку
+      return;
+    }
+
+    setStatus(Status.PENDING);
+
+    pokemonAPI
+      .fetchPokemon(pokemonName)
+      .then(pokemon => {
+        //== послідовність важлива!
+        setPokemon(pokemon);
+        setStatus(Status.RESOLVED);
+      })
+      .catch(error => {
+        setError(error);
+        setStatus(Status.REJECTED);
+      });
+  }, [pokemonName]);
+
+  if (status === Status.IDLE) {
+    return <div>Ведите имя покемона</div>;
+  }
+
+  if (status === Status.PENDING) {
+    return <PokemonPendingView pokemonName={pokemonName} />;
+  }
+  if (status === Status.REJECTED) {
+    return <PokemonErrorView message={error.message} />;
+  }
+  if (status === Status.RESOLVED) {
+    return <PokemonDataView pokemon={pokemon} />;
+  }
+}
+
+/* //== До рефакторинга с использованием хуков
 export default class PokemonInfo extends Component {
   state = {
     pokemon: null,
@@ -51,6 +100,8 @@ export default class PokemonInfo extends Component {
     }
   }
 }
+
+*/
 
 /* //== ДО рефакторинга и подключения предсказуемых состояний (патерна State Machine )
  //* этот метод только с проверками

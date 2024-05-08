@@ -1,27 +1,19 @@
-import { Component } from 'react';
+import { useState } from 'react';
 //*npm библиотека - нотификация, ставится на самом верхнем уровне(App у нас)
 import { ToastContainer } from 'react-toastify';
 import PokemonForm from './PokemonForm';
 import PokemonInfo from './PokemonInfo';
 
-export default class App extends Component {
-  state = {
-    pokemonName: '',
-  };
+export default function App() {
+  const [pokemonName, setPokemonName] = useState('');
 
-  handleFormSubmit = pokemonName => {
-    this.setState({ pokemonName });
-  };
-
-  render() {
-    return (
-      <div>
-        <PokemonForm onSubmit={this.handleFormSubmit} />
-        <PokemonInfo pokemonName={this.state.pokemonName} />
-        <ToastContainer autoClose={2000} />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <PokemonForm onSubmit={setPokemonName} />
+      <PokemonInfo pokemonName={pokemonName} />
+      <ToastContainer autoClose={2000} />
+    </div>
+  );
 }
 
 //* простой вариант фетча и рендера по http-запросу
